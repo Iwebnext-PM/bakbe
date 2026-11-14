@@ -128,6 +128,7 @@ export default function App() {
     'Local' | 'Regional' | 'OTR' | 'Dedicated' | 'Owner-Operator' | 'Open to Opportunities'
   >('Open to Opportunities');
   const [prefillSource, setPrefillSource] = useState<string | undefined>(undefined);
+  const [heroVideoError, setHeroVideoError] = useState(false);
 
   useEffect(() => {
     testFirestoreConnection();
@@ -485,13 +486,31 @@ export default function App() {
             {/* 4. HERO SECTION */}
             <section className="relative bg-[#07101E] text-white overflow-hidden">
               <div className="absolute inset-0">
-                <ResilientImage
-                  src={HERO_IMAGE}
-                  alt="American Class 8 semi-truck hauling a trailer down an open US highway at golden hour"
-                  fallbackLabel="ProDriver Trucking Careers"
-                  loading="eager"
-                  className="w-full h-full object-cover object-center"
-                />
+                {!heroVideoError ? (
+                  <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    poster={HERO_IMAGE}
+                    onError={() => setHeroVideoError(true)}
+                    aria-label="American Class 8 semi-truck hauling a trailer down an open US highway"
+                    className="w-full h-full object-cover object-center"
+                  >
+                    <source
+                      src="https://gyxjv04clhdtdj6r.public.blob.vercel-storage.com/Create_video_for_driver_5663de46.mp4"
+                      type="video/mp4"
+                    />
+                  </video>
+                ) : (
+                  <ResilientImage
+                    src={HERO_IMAGE}
+                    alt="American Class 8 semi-truck hauling a trailer down an open US highway at golden hour"
+                    fallbackLabel="ProDriver Trucking Careers"
+                    loading="eager"
+                    className="w-full h-full object-cover object-center"
+                  />
+                )}
                 <div
                   aria-hidden="true"
                   className="absolute inset-0 bg-gradient-to-r from-[#07101E]/95 via-[#0A1628]/80 to-[#07101E]/35"
