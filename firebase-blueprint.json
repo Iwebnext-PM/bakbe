@@ -1,0 +1,233 @@
+{
+  "entities": {
+    "DriverApplication": {
+      "title": "DriverApplication",
+      "description": "CDL driver career application submitted by a prospective commercial driver.",
+      "type": "object",
+      "properties": {
+        "fullName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 120,
+          "description": "Applicant full legal name."
+        },
+        "phone": {
+          "type": "string",
+          "minLength": 7,
+          "maxLength": 30,
+          "description": "Applicant primary phone number."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "minLength": 5,
+          "maxLength": 160,
+          "description": "Applicant email address."
+        },
+        "city": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "description": "Applicant city."
+        },
+        "state": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 40,
+          "description": "Applicant US state."
+        },
+        "zipCode": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 12,
+          "pattern": "^[0-9]{5}(-[0-9]{4})?$",
+          "description": "Applicant US ZIP code."
+        },
+        "cdlClass": {
+          "type": "string",
+          "enum": ["A", "B", "Other"],
+          "description": "Commercial Driver License class."
+        },
+        "cdlState": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 40,
+          "description": "State that issued the applicant CDL."
+        },
+        "yearsExperience": {
+          "type": "string",
+          "enum": ["Less than 1 year", "1-2 years", "3-5 years", "6-10 years", "10+ years"],
+          "description": "Commercial driving experience bracket."
+        },
+        "endorsements": {
+          "type": "array",
+          "description": "Selected CDL endorsements."
+        },
+        "drivingRecordNotes": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Optional initial driving record disclosure."
+        },
+        "preferredDrivingType": {
+          "type": "string",
+          "enum": ["Local", "Regional", "OTR", "Dedicated", "Owner-Operator", "Open to Opportunities"],
+          "description": "Preferred trucking route category."
+        },
+        "preferredEmploymentType": {
+          "type": "string",
+          "enum": ["Full-Time", "Part-Time", "Contract", "Flexible"],
+          "description": "Preferred employment arrangement."
+        },
+        "currentlyEmployed": {
+          "type": "string",
+          "enum": ["Yes", "No", "Prefer not to say"],
+          "description": "Current employment status."
+        },
+        "availableStartDate": {
+          "type": "string",
+          "enum": ["Immediately", "Within 2 weeks", "Within 30 days", "Flexible / Exploring"],
+          "description": "Availability window to start."
+        },
+        "additionalComments": {
+          "type": "string",
+          "maxLength": 1500,
+          "description": "Optional comments from the applicant."
+        },
+        "privacyConsent": {
+          "type": "boolean",
+          "description": "Explicit applicant privacy consent flag."
+        },
+        "sourceOpportunity": {
+          "type": "string",
+          "maxLength": 80,
+          "description": "Optional opportunity category slug from which the driver started the application."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["submitted", "reviewing", "contacted", "archived"],
+          "description": "Recruiter review status."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when application was submitted."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of latest update."
+        }
+      },
+      "required": [
+        "fullName",
+        "phone",
+        "email",
+        "city",
+        "state",
+        "zipCode",
+        "cdlClass",
+        "cdlState",
+        "yearsExperience",
+        "endorsements",
+        "preferredDrivingType",
+        "preferredEmploymentType",
+        "currentlyEmployed",
+        "availableStartDate",
+        "privacyConsent",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "ContactInquiry": {
+      "title": "ContactInquiry",
+      "description": "General driver or employer inquiry submitted through the Contact Us form.",
+      "type": "object",
+      "properties": {
+        "fullName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 120
+        },
+        "phone": {
+          "type": "string",
+          "minLength": 7,
+          "maxLength": 30
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "minLength": 5,
+          "maxLength": 160
+        },
+        "subject": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 160
+        },
+        "message": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 2000
+        },
+        "status": {
+          "type": "string",
+          "enum": ["new", "responded", "archived"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "fullName",
+        "phone",
+        "email",
+        "subject",
+        "message",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "AdminUser": {
+      "title": "AdminUser",
+      "description": "Authorized ProDriver recruitment administrator record.",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 160
+        },
+        "role": {
+          "type": "string",
+          "enum": ["admin"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["email", "role", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/driverApplications/{applicationId}": {
+      "schema": { "$ref": "#/entities/DriverApplication" },
+      "description": "Stores submitted CDL driver recruitment applications. Public write-create only with strict schema validation; admin-only read, list, update, delete."
+    },
+    "/contactInquiries/{inquiryId}": {
+      "schema": { "$ref": "#/entities/ContactInquiry" },
+      "description": "Stores driver and visitor contact inquiries. Public write-create only with strict schema validation; admin-only read, list, update, delete."
+    },
+    "/admins/{adminId}": {
+      "schema": { "$ref": "#/entities/AdminUser" },
+      "description": "Registry of authorized ProDriver recruiter admin UIDs."
+    }
+  }
+}

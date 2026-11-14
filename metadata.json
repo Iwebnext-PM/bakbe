@@ -1,0 +1,6 @@
+{
+  "name": "ProDriver",
+  "description": "ProDriver connects professional CDL-A and CDL-B truck drivers with local, regional, OTR, and owner-operator trucking career opportunities across the USA.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

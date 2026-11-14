@@ -1,0 +1,158 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 4 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      return isVerifiedUser() && (
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        request.auth.token.email == 'rituparno.tnts@gmail.com' ||
+        request.auth.token.email == 'iwebnext.com@gmail.com'
+      );
+    }
+
+    function isValidApplicationStatus(status) {
+      return status in ['submitted', 'reviewing', 'contacted', 'archived'];
+    }
+
+    function isValidDriverApplication(data) {
+      return data.keys().hasAll([
+        'fullName', 'phone', 'email', 'city', 'state', 'zipCode',
+        'cdlClass', 'cdlState', 'yearsExperience', 'endorsements',
+        'preferredDrivingType', 'preferredEmploymentType',
+        'currentlyEmployed', 'availableStartDate',
+        'privacyConsent', 'status', 'createdAt', 'updatedAt'
+      ])
+      && data.keys().hasOnly([
+        'fullName', 'phone', 'email', 'city', 'state', 'zipCode',
+        'cdlClass', 'cdlState', 'yearsExperience', 'endorsements',
+        'drivingRecordNotes', 'preferredDrivingType', 'preferredEmploymentType',
+        'currentlyEmployed', 'availableStartDate', 'additionalComments',
+        'privacyConsent', 'sourceOpportunity', 'status', 'createdAt', 'updatedAt'
+      ])
+      && data.fullName is string && data.fullName.size() >= 2 && data.fullName.size() <= 120
+      && data.phone is string && data.phone.size() >= 7 && data.phone.size() <= 30
+      && data.email is string && data.email.size() >= 5 && data.email.size() <= 160 && data.email.matches('^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$')
+      && data.city is string && data.city.size() >= 1 && data.city.size() <= 80
+      && data.state is string && data.state.size() >= 2 && data.state.size() <= 40
+      && data.zipCode is string && data.zipCode.size() >= 5 && data.zipCode.size() <= 12 && data.zipCode.matches('^[0-9]{5}(-[0-9]{4})?$')
+      && data.cdlClass in ['A', 'B', 'Other']
+      && data.cdlState is string && data.cdlState.size() >= 2 && data.cdlState.size() <= 40
+      && data.yearsExperience in ['Less than 1 year', '1-2 years', '3-5 years', '6-10 years', '10+ years']
+      && data.endorsements is list && data.endorsements.size() <= 10
+      && (data.endorsements.size() == 0 || data.endorsements[0] is string)
+      && (!('drivingRecordNotes' in data) || (data.drivingRecordNotes is string && data.drivingRecordNotes.size() <= 500))
+      && data.preferredDrivingType in ['Local', 'Regional', 'OTR', 'Dedicated', 'Owner-Operator', 'Open to Opportunities']
+      && data.preferredEmploymentType in ['Full-Time', 'Part-Time', 'Contract', 'Flexible']
+      && data.currentlyEmployed in ['Yes', 'No', 'Prefer not to say']
+      && data.availableStartDate in ['Immediately', 'Within 2 weeks', 'Within 30 days', 'Flexible / Exploring']
+      && (!('additionalComments' in data) || (data.additionalComments is string && data.additionalComments.size() <= 1500))
+      && (!('sourceOpportunity' in data) || (data.sourceOpportunity is string && data.sourceOpportunity.size() <= 80))
+      && data.privacyConsent is bool && data.privacyConsent == true
+      && isValidApplicationStatus(data.status)
+      && data.createdAt is timestamp
+      && data.updatedAt is timestamp;
+    }
+
+    function isValidInquiryStatus(status) {
+      return status in ['new', 'responded', 'archived'];
+    }
+
+    function isValidContactInquiry(data) {
+      return data.keys().hasAll([
+        'fullName', 'phone', 'email', 'subject', 'message', 'status', 'createdAt', 'updatedAt'
+      ])
+      && data.keys().hasOnly([
+        'fullName', 'phone', 'email', 'subject', 'message', 'status', 'createdAt', 'updatedAt'
+      ])
+      && data.fullName is string && data.fullName.size() >= 2 && data.fullName.size() <= 120
+      && data.phone is string && data.phone.size() >= 7 && data.phone.size() <= 30
+      && data.email is string && data.email.size() >= 5 && data.email.size() <= 160 && data.email.matches('^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$')
+      && data.subject is string && data.subject.size() >= 2 && data.subject.size() <= 160
+      && data.message is string && data.message.size() >= 5 && data.message.size() <= 2000
+      && isValidInquiryStatus(data.status)
+      && data.createdAt is timestamp
+      && data.updatedAt is timestamp;
+    }
+
+    function isValidAdminUser(data) {
+      return data.keys().hasAll(['email', 'role', 'createdAt'])
+      && data.keys().hasOnly(['email', 'role', 'createdAt'])
+      && data.email is string && data.email.size() >= 5 && data.email.size() <= 160
+      && data.role == 'admin'
+      && data.createdAt is timestamp;
+    }
+
+    match /driverApplications/{applicationId} {
+      allow create: if isValidId(applicationId)
+        && isValidDriverApplication(incoming())
+        && incoming().status == 'submitted'
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+
+      allow get, list: if isAdmin();
+
+      allow update: if isAdmin()
+        && isValidId(applicationId)
+        && isValidDriverApplication(incoming())
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt']);
+
+      allow delete: if isAdmin() && isValidId(applicationId);
+    }
+
+    match /contactInquiries/{inquiryId} {
+      allow create: if isValidId(inquiryId)
+        && isValidContactInquiry(incoming())
+        && incoming().status == 'new'
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+
+      allow get, list: if isAdmin();
+
+      allow update: if isAdmin()
+        && isValidId(inquiryId)
+        && isValidContactInquiry(incoming())
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt']);
+
+      allow delete: if isAdmin() && isValidId(inquiryId);
+    }
+
+    match /admins/{adminId} {
+      allow get: if isVerifiedUser() && request.auth.uid == adminId;
+      allow list: if isAdmin();
+      allow create: if isAdmin()
+        && isValidId(adminId)
+        && isValidAdminUser(incoming())
+        && incoming().createdAt == request.time;
+      allow update: if false;
+      allow delete: if isAdmin() && isValidId(adminId);
+    }
+  }
+}

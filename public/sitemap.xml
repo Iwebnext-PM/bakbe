@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>/about-us</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>/cdl-opportunities</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>/cdl-opportunities/cdl-a-driver-jobs</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>/cdl-opportunities/cdl-b-driver-jobs</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>/cdl-opportunities/local-truck-driving-jobs</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>/cdl-opportunities/regional-truck-driving-jobs</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>/cdl-opportunities/otr-truck-driving-jobs</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>/cdl-opportunities/owner-operator-opportunities</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>/driver-benefits</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>/driver-requirements</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>/apply</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>/faqs</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>/contact-us</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+</urlset>
